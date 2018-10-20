@@ -10,6 +10,7 @@ import Cocoa
 
 class MainWindowController: NSWindowController {
     
+    @IBOutlet weak var webview: WKWebView!
     @objc dynamic private var rValue: CGFloat = 1.0 { didSet { updateColor() } }
     @objc dynamic private var gValue: CGFloat = 0.5 { didSet { updateColor() } }
     @objc dynamic private var bValue: CGFloat = 0.0 { didSet { updateColor() } }
@@ -30,6 +31,7 @@ class MainWindowController: NSWindowController {
     
     override func windowDidLoad() {
         super.windowDidLoad()
+        webview.load
     }
     
 }

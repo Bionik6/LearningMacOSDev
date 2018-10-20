@@ -8,12 +8,12 @@
 
 import Cocoa
 
-
 class MainWindowController: NSWindowController {
     
     @IBOutlet weak var slider: NSSlider!
     
-    private let temperatureKeyPath = #keyPath(MainWindowController.temperature)
+    private let temperatureKey = #keyPath(MainWindowController.temperature)
+    private let stateKey = #keyPath(MainWindowController.state)
     
     @IBOutlet weak var stateButton: NSButton!
     
@@ -23,7 +23,7 @@ class MainWindowController: NSWindowController {
     
     private var privateTemp = 70
     
-    @objc dynamic var temperature: Int {
+    @objc var temperature: Int {
         set {
             print("set temperature to \(newValue)")
             privateTemp = newValue
@@ -49,21 +49,25 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         // Creating binding programmatically
-        slider.bind(.enabled, to: self, withKeyPath: "state", options: nil)
+        slider.bind(.enabled, to: self, withKeyPath: stateKey, options: nil)
     }
     
     @IBAction private func makeWarmer(button: NSButton) {
+        willChangeValue(forKey: temperatureKey)
         temperature += 1
+        didChangeValue(forKey: temperatureKey)
     }
     
     @IBAction private func makeCooler(button: NSButton) {
+        willChangeValue(forKey: temperatureKey)
         temperature -= 1
+        didChangeValue(forKey: temperatureKey)
     }
     
     // Methods to override if a value of a binding is nil
     override func setNilValueForKey(_ key: String) {
         switch key {
-        case temperatureKeyPath: temperature = 68
+        case temperatureKey: temperature = 68
         default: super.setNilValueForKey(key)
         }
     }

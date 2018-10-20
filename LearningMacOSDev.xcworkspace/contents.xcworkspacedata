@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Sandbox.playground">
+   </FileRef>
+   <FileRef
       location = "group:TodoList/TodoList.xcodeproj">
    </FileRef>
    <FileRef
