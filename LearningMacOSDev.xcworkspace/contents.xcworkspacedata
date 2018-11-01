@@ -5,6 +5,9 @@
       location = "group:Sandbox.playground">
    </FileRef>
    <FileRef
+      location = "group:Raisman/Raisman.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:TodoList/TodoList.xcodeproj">
    </FileRef>
    <FileRef

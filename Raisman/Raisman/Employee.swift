@@ -8,9 +8,11 @@
 
 import Foundation
 
-class Employee: NSObject {
+@objcMembers class Employee: NSObject {
     
-    @objc dynamic var name: String? = "New Employee"
-    @objc dynamic var raise: Float = 0.5
+    dynamic var name: String? = "New Employee"
+    dynamic var raise: Float = 0.5
+    
+    
     
 }

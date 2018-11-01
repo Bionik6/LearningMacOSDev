@@ -10,6 +10,7 @@ import Cocoa
 
 class Document: NSDocument {
     
+    @IBOutlet var arrayController: NSArrayController!
     @objc var employees = [Employee]()
     
     override init() {
@@ -27,8 +28,26 @@ class Document: NSDocument {
         return NSNib.Name("Document")
     }
     
-    
-    
+    @IBAction func removeEmployees(sender: NSButton) {
+        let selectedPeople: [Employee] = arrayController.selectedObjects as! [Employee]
+        let alert = NSAlert()
+        alert.messageText = "Do you really want to remove theses people?"
+        alert.informativeText = "\(selectedPeople.count) people will be removed"
+        alert.addButton(withTitle: "Remove")
+        alert.addButton(withTitle: "Keep, but no raise")
+        alert.addButton(withTitle: "Cancel")
+        let window = sender.window!
+        alert.beginSheetModal(for: window) { response in
+            switch response {
+            case NSApplication.ModalResponse.alertFirstButtonReturn:
+                // Tell the array controller to delete the selected objects
+                self.arrayController.remove(nil)
+            case NSApplication.ModalResponse.alertSecondButtonReturn:
+                selectedPeople.forEach { $0.raise = 0 }
+            default: break
+            }
+        }
+    }
     
 
 
