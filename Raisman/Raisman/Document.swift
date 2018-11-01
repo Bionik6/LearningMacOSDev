@@ -30,9 +30,15 @@ class Document: NSDocument {
     
     @IBAction func removeEmployees(sender: NSButton) {
         let selectedPeople: [Employee] = arrayController.selectedObjects as! [Employee]
+        let messageText = selectedPeople.count > 1
+            ? "Do you really want to remove theses people?"
+            : "Do you really want to remove this person"
+        let informativeText = selectedPeople.count > 1
+            ? "\(selectedPeople.count) people will be removed"
+            : "\(selectedPeople.first!.name!) will be removed"
         let alert = NSAlert()
-        alert.messageText = "Do you really want to remove theses people?"
-        alert.informativeText = "\(selectedPeople.count) people will be removed"
+        alert.messageText = messageText
+        alert.informativeText = informativeText
         alert.addButton(withTitle: "Remove")
         alert.addButton(withTitle: "Keep, but no raise")
         alert.addButton(withTitle: "Cancel")
@@ -40,7 +46,6 @@ class Document: NSDocument {
         alert.beginSheetModal(for: window) { response in
             switch response {
             case NSApplication.ModalResponse.alertFirstButtonReturn:
-                // Tell the array controller to delete the selected objects
                 self.arrayController.remove(nil)
             case NSApplication.ModalResponse.alertSecondButtonReturn:
                 selectedPeople.forEach { $0.raise = 0 }
