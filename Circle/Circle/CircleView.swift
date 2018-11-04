@@ -10,12 +10,22 @@ import Cocoa
 
 class CircleView: NSView {
     
-    var trackArea: NSTrackingArea!
-    var bezierPath: NSBezierPath!
-    private var context: NSGraphicsContext!
-    var showFill = false { didSet { needsDisplay = true } }
+    private var shapeLayer: CAShapeLayer!
+    private var trackArea: NSTrackingArea!
     
-    var shapeLayer: CAShapeLayer!
+    private var strokeWidth: CGFloat { return 10 }
+    
+    private var squarePath: CGPath {
+        let path = CGMutablePath()
+        path.addRect(bounds.insetBy(dx: strokeWidth/2, dy: strokeWidth/2))
+        return path
+    }
+    
+    private var initialPath: CGPath {
+        let path = CGMutablePath()
+        path.addEllipse(in: bounds.insetBy(dx: strokeWidth/2, dy: strokeWidth/2))
+        return path
+    }
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -32,11 +42,9 @@ class CircleView: NSView {
         return NSSize(width: 100, height: 100)
     }
     
-    override func draw(_ dirtyRect: NSRect) {
+    override func updateLayer() {
         shapeLayer = CAShapeLayer()
-        let strokeWidth: CGFloat = 10.0
-        let bezierPath = NSBezierPath(ovalIn: dirtyRect.insetBy(dx: strokeWidth/2, dy: strokeWidth/2))
-        shapeLayer.path = bezierPath.cgPath
+        shapeLayer.path = initialPath 
         shapeLayer.strokeColor = NSColor.red.cgColor
         shapeLayer.lineWidth = strokeWidth
         shapeLayer.fillColor =  NSColor.clear.cgColor
@@ -45,27 +53,42 @@ class CircleView: NSView {
     
     override func mouseEntered(with event: NSEvent) {
         addAnimation(event: event)
+        NSCursor.pointingHand.set()
     }
     
     override func mouseExited(with event: NSEvent) {
         addAnimation(event: event)
+        NSCursor.arrow.set()
     }
     
     private func addAnimation(event: NSEvent) {
-        let animation = CABasicAnimation(keyPath: #keyPath(CAShapeLayer.fillColor))
+        let animationGroup = CAAnimationGroup()
+        
+        let fillColorAnimation = CABasicAnimation(keyPath: #keyPath(CAShapeLayer.fillColor))
         switch event.type {
         case .mouseEntered:
-            animation.fromValue = NSColor.clear.cgColor
-            animation.toValue = NSColor(red: 1, green: 0, blue: 0, alpha: 0.3).cgColor
+            fillColorAnimation.toValue = NSColor(red: 1, green: 0, blue: 0, alpha: 0.3).cgColor
         case .mouseExited:
-            animation.fromValue = NSColor(red: 1, green: 0, blue: 0, alpha: 0.3).cgColor
-            animation.toValue = NSColor.clear.cgColor
+            fillColorAnimation.toValue = NSColor.clear.cgColor
         default: break
         }
-        animation.duration = 0.3
-        animation.isRemovedOnCompletion = false
-        animation.fillMode = .forwards
-        shapeLayer.add(animation, forKey: nil)
+        
+        let pathAnimation = CABasicAnimation(keyPath: #keyPath(CAShapeLayer.path))
+        switch event.type {
+        case .mouseEntered:
+            pathAnimation.toValue = squarePath
+        case .mouseExited:
+            pathAnimation.toValue = initialPath
+        default: break
+        }
+        
+        animationGroup.animations = [fillColorAnimation, pathAnimation]
+        animationGroup.duration = 1
+        animationGroup.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        animationGroup.isRemovedOnCompletion = false // don't remove after finishing
+        animationGroup.fillMode = .both // keep to value after finishing
+        
+        shapeLayer.add(animationGroup, forKey: nil)
     }
 }
 
